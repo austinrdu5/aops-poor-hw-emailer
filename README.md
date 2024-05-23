@@ -1,2 +1,2 @@
 # aops-poor-hw-emailer
-Streamlit app to automate weekly Poor HW Emails
+Streamlit app to automate weekly Poor HW Emails for AoPS Academy at Carmel Valley.
