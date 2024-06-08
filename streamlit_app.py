@@ -45,7 +45,7 @@ if uploaded_file is not None:
         file_name = f"emails_{timestamp}.csv"
 
         # 3.3 Prepare Metadata
-        file_metadata = {'name': file_name, 'parents': ['YOUR_FOLDER_ID']}
+        file_metadata = {'name': file_name, 'parents': ['1hkWVwOcfBSSkAnnj5r35ypuRCmM4_Ci3']}
         media = MediaIoBaseUpload(uploaded_file, mimetype='text/csv')
 
         # 3.4 Upload to Google Drive
