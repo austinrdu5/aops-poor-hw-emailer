@@ -3,7 +3,7 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
 
-# ... (rest of your imports)
+print(st.secrets)  # for debugging
 
 # Load credentials from Streamlit secrets (no need to modify the private key)
 creds = service_account.Credentials.from_service_account_info(
