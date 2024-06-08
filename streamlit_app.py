@@ -37,7 +37,7 @@ if uploaded_file is not None:
         # 2.1 Upload the File (Same as before)
         timestamp = pd.Timestamp.now().strftime("%Y%m%d_%H%M%S")
         file_name = f"emails_{timestamp}.csv"
-        file_metadata = {'name': file_name, 'parents': ['YOUR_FOLDER_ID']}
+        file_metadata = {'name': file_name, 'parents': ['1hkWVwOcfBSSkAnnj5r35ypuRCmM4_Ci3']}
         media = MediaIoBaseUpload(uploaded_file, mimetype='text/csv')
         file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
 
