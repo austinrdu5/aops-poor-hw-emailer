@@ -1,9 +1,7 @@
-import os
 import streamlit as st
 import pandas as pd
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
 from io import BytesIO
 import json
 
@@ -24,7 +22,7 @@ credentials_dict = {
     "type": GDRIVE_TYPE,
     "project_id": GDRIVE_PROJECT_ID,
     "private_key_id": GDRIVE_PRIVATE_KEY_ID,
-    "private_key": GDRIVE_PRIVATE_KEY,
+    "private_key": GDRIVE_PRIVATE_KEY.replace('\\n', '\n'),
     "client_email": GDRIVE_CLIENT_EMAIL,
     "client_id": GDRIVE_CLIENT_ID,
     "auth_uri": GDRIVE_AUTH_URI,
@@ -33,14 +31,9 @@ credentials_dict = {
     "client_x509_cert_url": GDRIVE_CLIENT_X509_CERT_URL
 }
 
-# Save the credentials dictionary as a JSON string and load it into ServiceAccountCredentials
-credentials_json = json.dumps(credentials_dict)
-credentials = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(credentials_json))
-
-# Authenticate and initialize PyDrive
-gauth = GoogleAuth()
-gauth.credentials = credentials
-drive = GoogleDrive(gauth)
+# Authenticate and initialize Google Drive API
+credentials = service_account.Credentials.from_service_account_info(credentials_dict)
+service = build('drive', 'v3', credentials=credentials)
 
 st.title("Weekly Customer Email Processor")
 
@@ -57,5 +50,17 @@ if uploaded_file is not None:
     current_date = pd.Timestamp.now().strftime('%Y-%m-%d')
     file_name = f"emails_{current_date}.csv"
     
-    # Save the DataFrame to a CSV file
-    df_new.to_csv(file
+    # Save the DataFrame to a CSV file in-memory
+    buffer = BytesIO()
+    df_new.to_csv(buffer, index=False)
+    buffer.seek(0)
+
+    # Upload the file to Google Drive
+    file_metadata = {
+        'name': file_name,
+        'mimeType': 'application/vnd.google-apps.spreadsheet'
+    }
+    media = MediaIoBaseUpload(buffer, mimetype='text/csv', resumable=True)
+    file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+
+    st.write("File uploaded successfully to Google Drive with ID:", file.get('id'))
