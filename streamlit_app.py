@@ -29,7 +29,7 @@ if uploaded_file is not None:
     # Prepare for Google Drive upload (Simplified)
     file_metadata = {
         'name': file_name,
-        'parents': ['YOUR_FOLDER_ID']  # Specify your folder ID
+        'parents': ['1aokxbYgfqCEia1c0uvK2EPDM_Vfm03Yb']  # Specify your folder ID
     }
     media = MediaIoBaseUpload(uploaded_file, mimetype='text/csv')
 
