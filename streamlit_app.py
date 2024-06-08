@@ -4,6 +4,7 @@ import os
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
+from io import BytesIO
 
 st.title("Weekly Customer Email Processor")
 
@@ -49,13 +50,14 @@ if uploaded_file is not None:
         items = results.get('files', [])
         csv_paths = sorted([item['name'] for item in items if item['name'].endswith('.csv')], reverse=True)
 
-        if len(csv_paths) >= 3:  # Ensure we have enough files for comparison
+        if len(csv_paths) >= 3:
             # 2.3 Read and Concatenate Previous Files
-            previous_dfs = [pd.read_csv(uploaded_file)]  # Start with the current file
-            for i in range(1, 3):  # Read the next two most recent files
+            previous_dfs = [pd.read_csv(uploaded_file)] 
+            for i in range(1, 3):
                 file_id = [item['id'] for item in items if item['name'] == csv_paths[i]][0]
                 request = service.files().get_media(fileId=file_id)
-                previous_dfs.append(pd.read_csv(request))
+                response_content = request.execute() 
+                previous_dfs.append(pd.read_csv(BytesIO(response_content)))  # Read from BytesIO
 
             previous_df = pd.concat(previous_dfs[1:])  # Concatenate the previous two
 
