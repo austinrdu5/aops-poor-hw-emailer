@@ -43,7 +43,7 @@ if uploaded_file is not None:
 
         # 2.2 List and Sort Files in Folder
         results = service.files().list(
-            q=f"'YOUR_FOLDER_ID' in parents",
+            q=f"'1hkWVwOcfBSSkAnnj5r35ypuRCmM4_Ci3' in parents",
             fields="nextPageToken, files(id, name)"
         ).execute()
         items = results.get('files', [])
