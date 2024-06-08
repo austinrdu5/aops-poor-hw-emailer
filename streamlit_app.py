@@ -1,15 +1,14 @@
 import streamlit as st
-import pandas as pd
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
 
-# ... (Your Streamlit secrets remain the same)
+# ... (rest of your imports)
 
-# Authenticate (Improved handling)
+# Load credentials from Streamlit secrets (no need to modify the private key)
 creds = service_account.Credentials.from_service_account_info(
-    st.secrets,  # Streamlit's secrets management
-    scopes=["https://www.googleapis.com/auth/drive"]  # Drive scope
+    st.secrets,
+    scopes=["https://www.googleapis.com/auth/drive"]
 )
 service = build('drive', 'v3', credentials=creds)
 
