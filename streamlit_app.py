@@ -7,9 +7,18 @@ from googleapiclient.http import MediaIoBaseUpload
 
 st.title("Weekly Customer Email Processor")
 
-# 1. Google Drive Authentication (Same as before)
+# 1. Load Service Account Information (Corrected)
 service_account_info = {
-    # ... (your service account credentials from secrets.toml)
+    "type": st.secrets["GDRIVE_TYPE"],
+    "project_id": st.secrets["GDRIVE_PROJECT_ID"],
+    "private_key_id": st.secrets["GDRIVE_PRIVATE_KEY_ID"],
+    "private_key": st.secrets["GDRIVE_PRIVATE_KEY"],
+    "client_email": st.secrets["GDRIVE_CLIENT_EMAIL"],
+    "client_id": st.secrets["GDRIVE_CLIENT_ID"],
+    "auth_uri": st.secrets["GDRIVE_AUTH_URI"],
+    "token_uri": st.secrets["GDRIVE_TOKEN_URI"],
+    "auth_provider_x509_cert_url": st.secrets["GDRIVE_AUTH_PROVIDER_X509_CERT_URL"],
+    "client_x509_cert_url": st.secrets["GDRIVE_CLIENT_X509_CERT_URL"],
 }
 
 try:
