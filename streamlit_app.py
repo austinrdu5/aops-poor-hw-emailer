@@ -22,6 +22,8 @@ service_account_info = {
     "client_x509_cert_url": st.secrets["GDRIVE_CLIENT_X509_CERT_URL"],
 }
 
+CSV_FOLDER_ID = "1swTPjp0nis07JBUtxzJSxwuvKwKmXG6f"
+
 try:
     creds = service_account.Credentials.from_service_account_info(
         service_account_info, scopes=["https://www.googleapis.com/auth/drive"]
@@ -31,6 +33,27 @@ except Exception as e:
     st.error(f"Error authenticating with Google Drive: {e}")
     st.stop()
 
+try: 
+    # Query for files in the specified folder, sorted by name
+    results = service.files().list(
+        q=f"'{CSV_FOLDER_ID}' in parents",
+        orderBy='name',  # Sort by file name
+        fields='nextPageToken, files(id, name)'
+    ).execute()
+    items = results.get('files', [])
+
+    if not items:
+        st.write('No files found.')
+    else:
+        # Create a Streamlit container to display the files neatly
+        with st.container():
+            st.header("I see the following CSVs in the folder:")
+
+            for item in items:
+                st.write(f"- {item['name']}")  # Display file names
+except Exception as e:
+    st.error(f"Error accessing Google Drive: {e}")
+
 # 2. File Upload and Processing
 uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 if uploaded_file is not None:
@@ -38,13 +61,13 @@ if uploaded_file is not None:
         # 2.1 Upload the File (Same as before)
         timestamp = pd.Timestamp.now().strftime("%Y%m%d_%H%M%S")
         file_name = f"emails_{timestamp}.csv"
-        file_metadata = {'name': file_name, 'parents': ['1hkWVwOcfBSSkAnnj5r35ypuRCmM4_Ci3']}
+        file_metadata = {'name': file_name, 'parents': [CSV_FOLDER_ID]}
         media = MediaIoBaseUpload(uploaded_file, mimetype='text/csv')
         file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-
+    
         # 2.2 List and Sort Files in Folder
         results = service.files().list(
-            q=f"'1hkWVwOcfBSSkAnnj5r35ypuRCmM4_Ci3' in parents",
+            q=f"{CSV_FOLDER_ID} in parents",
             fields="nextPageToken, files(id, name)"
         ).execute()
         items = results.get('files', [])
