@@ -22,8 +22,9 @@ service_account_info = {
     "client_x509_cert_url": st.secrets["GDRIVE_CLIENT_X509_CERT_URL"],
 }
 
-CSV_FOLDER_ID = "1swTPjp0nis07JBUtxzJSxwuvKwKmXG6f"
+CSV_FOLDER_ID = "1pS27r6Hpb_a17kmQPURIRNfS2RYUnZc5"
 
+# Authenticate with Google Drive
 try:
     creds = service_account.Credentials.from_service_account_info(
         service_account_info, scopes=["https://www.googleapis.com/auth/drive"]
@@ -33,8 +34,8 @@ except Exception as e:
     st.error(f"Error authenticating with Google Drive: {e}")
     st.stop()
 
+# Query for files in the specified folder, sorted by name
 try: 
-    # Query for files in the specified folder, sorted by name
     results = service.files().list(
         q=f"'{CSV_FOLDER_ID}' in parents",
         orderBy='name',  # Sort by file name
@@ -67,7 +68,7 @@ if uploaded_file is not None:
     
         # 2.2 List and Sort Files in Folder
         results = service.files().list(
-            q=f"{CSV_FOLDER_ID} in parents",
+            q=f"'{CSV_FOLDER_ID}' in parents",
             fields="nextPageToken, files(id, name)"
         ).execute()
         items = results.get('files', [])
