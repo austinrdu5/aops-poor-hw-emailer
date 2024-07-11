@@ -4,7 +4,6 @@ import streamlit as st
 import pandas as pd
 from io import BytesIO
 import base64
-import datetime
 from googleapiclient.http import MediaIoBaseUpload
 
 
@@ -22,7 +21,7 @@ def authenticate(service_account_info):
 
 # Function to list alphabetically last 3 files in the specified folder
 # Returns a list of dictionaries with file ID and name
-def get_csvs(service, n, folder_id):
+def list_csv_info(service, n, folder_id):
     try:
         results = service.files().list(
             q=f"'{folder_id}' in parents",
@@ -69,18 +68,29 @@ def _combine_siblings_and_classes(df):
     return combined
 
 # Function to process most recent CSVs, returns list of DataFrames
-def process_csvs(service, csv_list):
-    current = read_csv(service, csv_list[0]['id'])
-    previous1 = read_csv(service, csv_list[1]['id'])
-    previous2 = read_csv(service, csv_list[2]['id'])
-
+def process_dfs(*args):
     try:
-        # TODO: add conditional check here
-        previous = pd.concat([previous1, previous2])
+        # handle different number of arguments
+        if len(args) == 0:
+            st.warning("Not enough files in the folder to process.")
+            st.stop()
+        elif len(args) == 1:
+            to_email = args[0]
+        else:
+            if len(args) == 2:
+                current = args[0]
+                previous = args[1]
+            else:
+                current = args[0]
+                previous1 = args[1]
+                previous2 = args[2]
 
-        # remove rows in current_df that occur in previous_df
-        merged_df = current.merge(previous, how='left', indicator=True)
-        to_email = merged_df[merged_df['_merge'] == 'left_only'].drop(columns='_merge')
+            # TODO: add conditional check here
+            previous = pd.concat([previous1, previous2])
+
+            # remove rows in current_df that occur in previous_df
+            merged_df = current.merge(previous, how='left', indicator=True)
+            to_email = merged_df[merged_df['_merge'] == 'left_only'].drop(columns='_merge')
 
         # rename email column to 'email' (Front requires this)
         to_email = to_email.rename(columns={'primary parent email': 'email'})
