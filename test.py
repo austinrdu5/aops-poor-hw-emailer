@@ -9,22 +9,19 @@ data = {
 
 st.title("Dynamic Content with Checkbox")
 
-selected_option = st.checkbox("Show Option 1")
-22222221
-if selected_option:
-    st.write(data["Option 1"])
-else:
-    # Get the selected options from the previous session
-    if 'selected_options' not in st.session_state:
-        st.session_state['selected_options'] = []
-    selected_options = st.session_state['selected_options']
+files = [f"file_{i}.csv"  for i in [1, 2, 3]]
 
-    # Create a multiselect widget to allow the user to select multiple options
-    options = st.multiselect("Select options:", list(data.keys()), default=selected_options)
+selected_option = st.selectbox("Remove duplicates from:", options=['last 2 weeks', 'last week', 'none'])
 
-    # Update the selected options in the session state
-    st.session_state['selected_options'] = options
+st.write('Emailing:')
+st.write(files[0])
 
-    # Display the selected options
-    for option in options:
-        st.write(data[option])
+if selected_option == 'last 2 weeks':
+    st.write('except emails from:')
+    st.write(files[1])
+    st.write(files[2])
+elif selected_option == 'last week':
+    st.write('except emails from:')
+    st.write(files[1])
+elif selected_option == 'none':
+    pass

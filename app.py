@@ -21,26 +21,44 @@ service_account_info = {
 # -- Begin Streamlit App --
 
 st.title("SDCV Poor HW Emailer")
-st.write("This app processes a CSV file of student information and sends emails to parents who have not completed homework.")
+st.write("This app processes the last 3 week's Poor Homework Reports and downloads CSVs for sequence emailing (for lower-, middle-, and upper-level families).")
+
+st.write("To add a new file, please upload a CSV into [this Google Drive folder](https://drive.google.com/drive/folders/1pS27r6Hpb_a17kmQPURIRNfS2RYUnZc5) and refresh the page. \
+         Please note that the app uses the file names to sort by newest, so please maintain the preexisting naming conventions (poor_hw_reportYYYY-MM-DD... .csv).")
+
+st.write("You can also use the selection box below to choose which emails to omit from the sequence email, to avoid parents getting emailed too frequently.")
 
 # Authenticate
-service = authenticate(service_account_info)
+if 'service' not in st.session_state:
+    st.session_state['service'] = authenticate(service_account_info)
+service = st.session_state['service']
 
-# Display most recent files
+# Get most recent files in the folder
+if 'csv_list' not in st.session_state:
+    st.session_state['csv_list'] = list_csv_info(service, 3, CSV_FOLDER_ID)
+csv_list = st.session_state['csv_list']
+
+# Early termination
+if len(csv_list) == 0:
+    st.error(f"No files detected in Google Drive folder.")
+    st.stop()
+
+# Dynamically display most recent files
+selected_option = st.selectbox("Remove duplicate emails from:", options=['Last 2 weeks', 'Last week', 'Keep all emails'])
+
 with st.container():
-    st.header("Most recent files in folder (alphabetically):")
+    
+    st.subheader('Email parents from this file:')
+    st.write("- " + csv_list[0]['name'])
 
-    # Get most recent files in the folder
-    csv_list = list_csv_info(service, 3, CSV_FOLDER_ID)
-
-    if not csv_list:
-        st.write('No files found.')
-    else:
-        for item in csv_list:
-            st.write(f"- {item['name']}") 
-
-st.write("To add a new file, please upload a CSV into [this Google Drive folder](https://drive.google.com/drive/folders/1pS27r6Hpb_a17kmQPURIRNfS2RYUnZc5). \
-         Please note that the app uses the file names to sort by newest, so please following the preexisting naming conventions (poor_hw_reportYYYY-MM-DD... .csv).")
+    st.subheader("But don't email parents from these files:")
+    if selected_option == 'Last 2 weeks':
+        st.write("- " + csv_list[1]['name'])
+        st.write("- " + csv_list[2]['name'])
+    elif selected_option == 'Last week':
+        st.write("- " + csv_list[1]['name'])
+    elif selected_option == 'Keep all emails':
+        st.write("No emails to be omitted.")
 
 with st.container():
     st.header("Generate CSVs for this week's sequence emails")
