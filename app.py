@@ -84,6 +84,6 @@ with st.container():
                 date_string = dt.datetime.now().strftime("%Y-%m-%d")
 
                 # download DataFrames as CSVs
-                download_csv(lower, f"lower_{date_string}.csv", "Download CSV for lower-level students")
-                download_csv(middle, f"middle_{date_string}.csv", "Download CSV for mid-level students")
-                download_csv(upper, f"upper_{date_string}.csv", "Download CSV for upper-level students")
+                download_csv(lower, f"lower_{date_string}.csv", "CSV for lower-level students")
+                download_csv(middle, f"middle_{date_string}.csv", "CSV for mid-level students")
+                download_csv(upper, f"upper_{date_string}.csv", "CSV for upper-level students")
