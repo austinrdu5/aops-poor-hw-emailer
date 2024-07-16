@@ -64,11 +64,13 @@ with st.container():
         st.write("No emails to be omitted.")
 
 with st.container():
-    st.header("Generate CSVs for this week's sequence emails")
+    st.header("Download Sequence CSVs")
+    st.write("Use the button below to generate CSVs for use with Front's sequence emailer. " +
+             "These are designed for the templates titled \"Poor HW Report\" and should have columns email, student name, class name, and primary parent.")
 
     # Button to process and download CSVs
     if st.button("Get this week's sequence CSVs"):
-        with st.spinner("Processing reports..."):
+        with st.spinner("Processing emails..."):
 
             if len(csv_list) == 0:
                 st.warning("Not enough files in the folder to process.")
