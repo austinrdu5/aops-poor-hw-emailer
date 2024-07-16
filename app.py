@@ -21,10 +21,9 @@ service_account_info = {
 # -- Begin Streamlit App --
 
 st.title("SDCV Poor HW Emailer")
-st.write("This app processes the last 3 week's Poor Homework Reports and downloads CSVs for sequence emailing (for lower-, middle-, and upper-level families).")
-
-st.write("To add a new file, please upload a CSV into [this Google Drive folder](https://drive.google.com/drive/folders/1pS27r6Hpb_a17kmQPURIRNfS2RYUnZc5) and refresh the page. \
-         Please note that the app sorts files by name, so please maintain the preexisting naming conventions (poor_hw_reportYYYY-MM-DD... .csv).")
+st.write("This app turns [AoPS Poor Homework Reports](https://sandiego-cv.aopsacademy.org/reports/poor-hw-performance) into CSVs for sequence emailing.")
+st.write("To begin, upload the most recent Poor Homework Report into [this Google Drive folder](https://drive.google.com/drive/folders/1pS27r6Hpb_a17kmQPURIRNfS2RYUnZc5) and refresh the page. " +
+         "Since files are sorted by name, please maintain the preexisting naming conventions (poor_hw_reportYYYY-MM-DD... .csv) so the app can detect which Reports are most recent.")
 
 # Authenticate
 if 'service' not in st.session_state:
@@ -42,13 +41,13 @@ if len(csv_list) == 0:
     st.stop()
 
 st.header('Customization')
-st.write("With the box below, you can use prior files to omit emails from the result, to avoid parents getting emailed too frequently.")
+st.write("If a student consistently shows up in the Poor HW Reports and you want to avoid emailing those parents too frequently, you can omit repeated emails from up to two prior reports here.")
 
-# Dynamically display most recent files
+# Dynamically display most recent files 
 option1 = 'Prior 2 weeks'
 option2 = 'Prior week'
 option3 = 'Keep all emails'
-selected_option = st.selectbox("Remove duplicate emails from:", options=[option1, option2, option3])
+selected_option = st.selectbox("Remove repeated emails from:", options=[option1, option2, option3])
 
 with st.container():
     
