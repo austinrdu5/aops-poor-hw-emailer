@@ -24,9 +24,7 @@ st.title("SDCV Poor HW Emailer")
 st.write("This app processes the last 3 week's Poor Homework Reports and downloads CSVs for sequence emailing (for lower-, middle-, and upper-level families).")
 
 st.write("To add a new file, please upload a CSV into [this Google Drive folder](https://drive.google.com/drive/folders/1pS27r6Hpb_a17kmQPURIRNfS2RYUnZc5) and refresh the page. \
-         Please note that the app uses the file names to sort by newest, so please maintain the preexisting naming conventions (poor_hw_reportYYYY-MM-DD... .csv).")
-
-st.write("You can also use the selection box below to choose which emails to omit from the sequence email, to avoid parents getting emailed too frequently.")
+         Please note that the app sorts files by name, so please maintain the preexisting naming conventions (poor_hw_reportYYYY-MM-DD... .csv).")
 
 # Authenticate
 if 'service' not in st.session_state:
@@ -43,47 +41,50 @@ if len(csv_list) == 0:
     st.error(f"No files detected in Google Drive folder.")
     st.stop()
 
+st.header('Customization')
+st.write("With the box below, you can use prior files to omit emails from the result, to avoid parents getting emailed too frequently.")
+
 # Dynamically display most recent files
-selected_option = st.selectbox("Remove duplicate emails from:", options=['Last 2 weeks', 'Last week', 'Keep all emails'])
+option1 = 'Prior 2 weeks'
+option2 = 'Prior week'
+option3 = 'Keep all emails'
+selected_option = st.selectbox("Remove duplicate emails from:", options=[option1, option2, option3])
 
 with st.container():
     
-    st.subheader('Email parents from this file:')
+    st.write('The final result will include parent emails from this file:')
     st.write("- " + csv_list[0]['name'])
 
-    st.subheader("But don't email parents from these files:")
-    if selected_option == 'Last 2 weeks':
+    st.write("But exclude parent emails from these files:")
+    if selected_option == option1:
         st.write("- " + csv_list[1]['name'])
         st.write("- " + csv_list[2]['name'])
-    elif selected_option == 'Last week':
+    elif selected_option == option2:
         st.write("- " + csv_list[1]['name'])
-    elif selected_option == 'Keep all emails':
+    elif selected_option == option3:
         st.write("No emails to be omitted.")
 
 with st.container():
     st.header("Generate CSVs for this week's sequence emails")
 
-    st.write("This will process the three most recent files in the folder and generate three CSVs for lower-, middle-, and upper-level students respectively. \
-             Behind the scenes, the app will omit emails that have already been sent in the previous 2 weeks ()")
+    # Button to process and download CSVs
+    if st.button("Get this week's sequence CSVs"):
+        with st.spinner("Processing reports..."):
 
-# Button to process and download CSVs
-if st.button("Get this week's sequence CSVs"):
-    with st.spinner("Processing reports..."):
+            if len(csv_list) == 0:
+                st.warning("Not enough files in the folder to process.")
+                st.stop()
+            else:
+                # convert CSVs to DataFrames
+                df_list = [read_csv(service, item['id']) for item in csv_list]
 
-        if len(csv_list) == 0:
-            st.warning("Not enough files in the folder to process.")
-            st.stop()
-        else:
-            # convert CSVs to DataFrames
-            df_list = [read_csv(service, item['id']) for item in csv_list]
+                # process DataFrames into lower, middle, and upper 
+                lower, middle, upper = process_dfs(*df_list)
 
-            # process DataFrames into lower, middle, and upper 
-            lower, middle, upper = process_dfs(*df_list)
+                # get date as string
+                date_string = dt.datetime.now().strftime("%Y-%m-%d")
 
-            # get date as string
-            date_string = dt.datetime.now().strftime("%Y-%m-%d")
-
-            # download DataFrames as CSVs
-            download_csv(lower, f"lower_{date_string}.csv")
-            download_csv(middle, f"middle_{date_string}.csv")
-            download_csv(upper, f"upper_{date_string}.csv")
+                # download DataFrames as CSVs
+                download_csv(lower, f"lower_{date_string}.csv", "Download CSV for lower-level students")
+                download_csv(middle, f"middle_{date_string}.csv", "Download CSV for mid-level students")
+                download_csv(upper, f"upper_{date_string}.csv", "Download CSV for upper-level students")

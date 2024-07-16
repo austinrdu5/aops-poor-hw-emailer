@@ -44,6 +44,20 @@ def read_csv(service, file_id):
         st.error(f"Error reading file: {e}")
         st.stop()
 
+def _assign_level(df):
+    '''
+    Add a column that indicates the class level of each class
+    '''
+    # partition classes into three levels
+    lower_classes = ['Math Level 1', 'Math Level 2', 'Math Level 3', 'Math Level 4', 'Math Level 5', 'Science Level 3']
+    middle_classes = ['Prealgebra', 'Algebra 1', 'Geometry', 'Algebra 2']
+    upper_classes = ['Precalculus', 'Calculus', 'Middle School Contest Math', 'High School Contest Math']
+
+    # create a new column that indicates the class level
+    df['class level'] = df['class name'].apply(lambda x: 1 if x in lower_classes else (2 if x in middle_classes else 3))
+
+    return df   
+
 # Function that takes a pandas series and returns a string with Oxford comma
 def _oxford_comma(series):
     # remove duplicates with set
@@ -104,6 +118,9 @@ def process_dfs(*args):
         # only keep columns email, student name, and class name
         to_email = to_email[['email', 'student name', 'class name', 'primary parent']]
 
+        # add column 
+        to_email = _assign_level(to_email)
+        
         # split into lower, middle, and upper class levels
         lower = to_email[to_email['class level'] == 1].drop(columns=['class level'])
         middle = to_email[to_email['class level'] == 2].drop(columns=['class level'])
@@ -121,8 +138,8 @@ def process_dfs(*args):
         st.stop()
 
 # Function to download CSV to user's local machine
-def download_csv(df, file_name):
+def download_csv(df, file_name, link_name):
     csv = df.to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()
-    href = f'<a href="data:file/csv;base64,{b64}" download="{file_name}">Download CSV File</a>'
+    href = f'<a href="data:file/csv;base64,{b64}" download="{file_name}">{link_name}</a>'
     st.markdown(href, unsafe_allow_html=True)
