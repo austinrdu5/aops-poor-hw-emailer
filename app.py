@@ -21,9 +21,9 @@ service_account_info = {
 # -- Begin Streamlit App --
 
 st.title("SDCV Poor HW Emailer")
-st.write("This app uses [AoPS Poor Homework Reports](https://sandiego-cv.aopsacademy.org/reports/poor-hw-performance) to generate CSVs for weekly sequence emailing." +
-         " You can get a report by using the 'Export to CSV' button.")
-st.write("To begin, upload the most recent Poor Homework Report (into [this Google Drive folder](https://drive.google.com/drive/folders/1pS27r6Hpb_a17kmQPURIRNfS2RYUnZc5) and refresh the page. " +
+st.write("This app uses AoPS Poor Homework Reports to generate CSVs compatible with Front's sequence emailer." +
+         " Generate a weekly Homework Report using the 'Export to CSV' button from [this site](https://sandiego-cv.aopsacademy.org/reports/poor-hw-performance).")
+st.write("To begin, upload the most recent Poor Homework Report into [this Google Drive folder](https://drive.google.com/drive/folders/1pS27r6Hpb_a17kmQPURIRNfS2RYUnZc5) and refresh the page. " +
          "Since files are sorted by name, please maintain the preexisting naming conventions (poor_hw_reportYYYY-MM-DD... .csv) so the app can detect which Reports are most recent.")
 
 # Authenticate
@@ -40,6 +40,11 @@ csv_list = st.session_state['csv_list']
 if len(csv_list) == 0:
     st.error(f"No files detected in Google Drive folder.")
     st.stop()
+
+# Button to refresh Google Drive
+if st.button("Refresh files seen in Google Drive"):
+    st.session_state['csv_list'] = list_csv_info(service, 3, CSV_FOLDER_ID)
+    csv_list = st.session_state['csv_list']
 
 st.header('Customization')
 st.write("If a student consistently shows up in the Poor HW Reports and you want to avoid emailing those parents too frequently, you can omit repeated emails from up to two prior reports here.")
@@ -66,8 +71,8 @@ with st.container():
 
 with st.container():
     st.header("Download Sequence CSVs")
-    st.write("Use the button below to generate CSVs for use with Front's sequence emailer. " +
-             "These are designed for the templates titled \"Poor HW Report\" and should have columns email, student name, class name, and primary parent.")
+    st.write("The button below generates CSVs for use with Front's sequence emailer. " +
+             "These are designed for the templates titled \"Poor HW Report\" and will have columns: email, student name, class name, and primary parent.")
 
     # Button to process and download CSVs
     if st.button("Get this week's sequence CSVs"):
