@@ -21,8 +21,9 @@ service_account_info = {
 # -- Begin Streamlit App --
 
 st.title("SDCV Poor HW Emailer")
-st.write("This app turns [AoPS Poor Homework Reports](https://sandiego-cv.aopsacademy.org/reports/poor-hw-performance) into CSVs for sequence emailing.")
-st.write("To begin, upload the most recent Poor Homework Report into [this Google Drive folder](https://drive.google.com/drive/folders/1pS27r6Hpb_a17kmQPURIRNfS2RYUnZc5) and refresh the page. " +
+st.write("This app uses [AoPS Poor Homework Reports](https://sandiego-cv.aopsacademy.org/reports/poor-hw-performance) to generate CSVs for weekly sequence emailing." +
+         " You can get a report by using the 'Export to CSV' button.")
+st.write("To begin, upload the most recent Poor Homework Report (into [this Google Drive folder](https://drive.google.com/drive/folders/1pS27r6Hpb_a17kmQPURIRNfS2RYUnZc5) and refresh the page. " +
          "Since files are sorted by name, please maintain the preexisting naming conventions (poor_hw_reportYYYY-MM-DD... .csv) so the app can detect which Reports are most recent.")
 
 # Authenticate
